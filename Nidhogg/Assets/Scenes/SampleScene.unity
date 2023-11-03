@@ -2422,7 +2422,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.20703627}
+  m_Offset: {x: 0, y: -0.15864754}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -2433,7 +2433,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 0.5859275}
+  m_Size: {x: 1, y: 0.6827049}
   m_EdgeRadius: 0
 --- !u!212 &751092644
 SpriteRenderer:
@@ -2765,6 +2765,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 865406965}
   m_CullTransparentMesh: 1
+--- !u!1 &1009140321
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1009140322}
+  m_Layer: 0
+  m_Name: PLatForm
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1009140322
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009140321}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.42, z: 0}
+  m_LocalScale: {x: 0.295837, y: 0.295837, z: 0.295837}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1771331964}
+  m_Father: {fileID: 1797543911}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1136182272
 GameObject:
   m_ObjectHideFlags: 0
@@ -3639,7 +3671,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 489005123728c9e4684a04ee432557fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
+  speed: 8
   swordPlacement: {fileID: 691081388}
   swordOverHeadPlace: {fileID: 1997009743}
   sword: {fileID: 0}
@@ -4228,10 +4260,14 @@ Tilemap:
   m_AnimatedTiles: {}
   m_TileAssetArray:
   - m_RefCount: 8
-    m_Data: {fileID: 11400000, guid: 879fc72e1eb8c4f41bb9cb1f887fa28a, type: 2}
+    m_Data: {fileID: 11400000, guid: ffb868ef5cdd8db41be41630327d9a01, type: 2}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileSpriteArray:
   - m_RefCount: 8
-    m_Data: {fileID: 21300000, guid: 553e1bb35932c4346b95f363c9947784, type: 3}
+    m_Data: {fileID: 21300000, guid: ddef1edb7b33b7745be5d130c6f02ddd, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 8
     m_Data:
@@ -4492,13 +4528,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1771331963}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.33, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 3.38024, y: 3.38024, z: 3.38024}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1299169639}
-  m_Father: {fileID: 1797543911}
-  m_RootOrder: 5
+  m_Father: {fileID: 1009140322}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!483693784 &1771331966
 TilemapRenderer:
@@ -4944,7 +4980,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1797543911}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!483693784 &1794325139
 TilemapRenderer:
@@ -5187,8 +5223,8 @@ Transform:
   - {fileID: 690110565}
   - {fileID: 1434648936}
   - {fileID: 1945830530}
-  - {fileID: 1771331964}
   - {fileID: 1794325138}
+  - {fileID: 1009140322}
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

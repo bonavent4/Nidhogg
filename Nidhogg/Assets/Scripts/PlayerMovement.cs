@@ -60,9 +60,10 @@ public class PlayerMovement : MonoBehaviour
     }
     void Movement()
     {
+        anim.SetInteger("SwordPlace", swordPlace);
         if (Input.GetAxis(walkAxis) != 0)
         {
-            anim.SetInteger("SwordPlace", swordPlace);
+            
             anim.SetBool("IsRunning", true);
             
             gameObject.transform.position += new Vector3(Input.GetAxis(walkAxis) * speed * Time.deltaTime, 0, 0);
