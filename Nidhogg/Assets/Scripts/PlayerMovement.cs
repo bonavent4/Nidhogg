@@ -41,7 +41,13 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] GameObject playerSprite;
 
-    
+    [SerializeField] Animator anim;
+    private void Start()
+    {
+        anim = GetComponentInChildren<Animator>();
+    }
+
+
     private void Update()
     {
         JumpAndDuck();
@@ -56,6 +62,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetAxis(walkAxis) != 0)
         {
+            anim.SetInteger("SwordPlace", swordPlace);
+            anim.SetBool("IsRunning", true);
+            
             gameObject.transform.position += new Vector3(Input.GetAxis(walkAxis) * speed * Time.deltaTime, 0, 0);
             if (Input.GetAxis(walkAxis) > 0)
             {
@@ -65,6 +74,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 gameObject.transform.rotation = Quaternion.Euler(gameObject.transform.rotation.x, 0, gameObject.transform.rotation.z);
             }
+        }
+        else
+        {
+            Debug.Log("Not Running");
+            anim.SetBool("IsRunning", false);
         }
     }
     void JumpAndDuck()
