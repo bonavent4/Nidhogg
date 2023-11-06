@@ -57,8 +57,8 @@ public class Manager : MonoBehaviour
             {
                 if(cam.transform.position.x > 0)
                 {
-                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[stage], cam.transform.position.y, cam.transform.position.z), followSpeed);
-                    if (PlayerToFollow.transform.position.x > endPoints[stage] + endOfStage)
+                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[moreThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
+                    if (PlayerToFollow.transform.position.x > endPoints[moreThanEndPoint] + endOfStage)
                     {
                         gameState++;
                         changeScene();
@@ -66,8 +66,8 @@ public class Manager : MonoBehaviour
                 }
                 else
                 {
-                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(-endPoints[stage], cam.transform.position.y, cam.transform.position.z), followSpeed);
-                    if (PlayerToFollow.transform.position.x < -endPoints[stage] - endOfStage)
+                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(-endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
+                    if (PlayerToFollow.transform.position.x < -endPoints[lessThanEndPoint] - endOfStage)
                     {
                         gameState--;
                         changeScene();

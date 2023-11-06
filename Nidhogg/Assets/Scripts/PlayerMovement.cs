@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     public bool isOnGround;
 
     [SerializeField] float jumpForce;
+    [SerializeField] float thrustForce;
     //bool done;
     bool canUse;
     float timer;
@@ -38,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isPlayer1;
 
-    bool isSwinging;
+    [SerializeField]bool isSwinging;
     public bool swordGoingBack;
     Vector3 previousPosition;
     Vector3 goToPosition;
@@ -213,6 +214,9 @@ public class PlayerMovement : MonoBehaviour
 
                 sword.GetComponent<Sword>().isInHands = false;
 
+
+                
+
                 sword = null;
                 hasSword = false;
                 canThrow = false;
@@ -222,6 +226,8 @@ public class PlayerMovement : MonoBehaviour
                 previousPosition = sword.transform.localPosition;
                 goToPosition = new Vector3(sword.transform.localPosition.x - swordSwingOffset, sword.transform.localPosition.y, sword.transform.localPosition.z);
                 isSwinging = true;
+                anim.SetBool("IsThrusting", true);
+                gameObject.GetComponent<Rigidbody2D>().AddForce(-transform.right * thrustForce);
             }
         }
         if (isSwinging)
@@ -240,6 +246,7 @@ public class PlayerMovement : MonoBehaviour
                 else
                 {
                     isSwinging = false;
+                    anim.SetBool("IsThrusting", false);
                     swordGoingBack = false;
                 }
                 
