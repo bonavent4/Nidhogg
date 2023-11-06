@@ -21,9 +21,10 @@ public class Manager : MonoBehaviour
     [SerializeField] float[] endPoints;
     [SerializeField] float endOfStage;
     int stage = 0;
-    int lessThanEndPoint;
-    int moreThanEndPoint;
+    [SerializeField]int lessThanEndPoint;
+    [SerializeField]int moreThanEndPoint;
 
+    
     
 
     private void Start()
@@ -42,35 +43,37 @@ public class Manager : MonoBehaviour
     {
         if (PlayerToFollow != null)
         {
-            if(gameState >= 4)
-            {
-                lessThanEndPoint = stage;
-                moreThanEndPoint = stage + 1;
-            }
-            else 
-            {
-                lessThanEndPoint = stage + 1;
-                moreThanEndPoint = stage;
-            }
+            LessThanMoreThanState();
             
-            if(PlayerToFollow.transform.position.x <= -endPoints[lessThanEndPoint] || PlayerToFollow.transform.position.x >= endPoints[moreThanEndPoint])
+            if(PlayerToFollow.transform.position.x <= endPoints[lessThanEndPoint] || PlayerToFollow.transform.position.x >= endPoints[moreThanEndPoint])
             {
-                if(cam.transform.position.x > 0)
+                if(PlayerToFollow.transform.position.x > endPoints[moreThanEndPoint])
                 {
                     cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[moreThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
                     if (PlayerToFollow.transform.position.x > endPoints[moreThanEndPoint] + endOfStage)
                     {
-                        gameState++;
-                        changeScene();
+                         gameState++;
+                          changeScene();
+                        LessThanMoreThanState();
+                        PlayerToFollow.transform.position += new Vector3(endOfStage, 0, 0);
+                         cam.transform.position = new Vector3(endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z);
+                            
                     }
                 }
-                else
+                else 
                 {
-                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(-endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
-                    if (PlayerToFollow.transform.position.x < -endPoints[lessThanEndPoint] - endOfStage)
+                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
+                    if (PlayerToFollow.transform.position.x < endPoints[lessThanEndPoint] - endOfStage)
                     {
-                        gameState--;
-                        changeScene();
+                       
+                          gameState--;
+                          changeScene();
+                        LessThanMoreThanState();
+                          PlayerToFollow.transform.position += new Vector3(-endOfStage, 0, 0);
+                          cam.transform.position = new Vector3(endPoints[moreThanEndPoint], cam.transform.position.y, cam.transform.position.z);
+                            
+                        
+
                     }
                 }
             }
@@ -143,5 +146,52 @@ public class Manager : MonoBehaviour
         Debug.Log("change Scene");
         stage += 2;
         
+        
+    }
+
+    void LessThanMoreThanState()
+    {
+        if (gameState == 4)
+        {
+            lessThanEndPoint = stage;
+            moreThanEndPoint = stage + 1;
+
+            if (endPoints[lessThanEndPoint] > 0)
+            {
+                endPoints[lessThanEndPoint] = endPoints[lessThanEndPoint] * -1;
+            }
+            if (endPoints[moreThanEndPoint] < 0)
+            {
+                endPoints[moreThanEndPoint] = endPoints[moreThanEndPoint] * -1;
+            }
+
+        }
+        else if (gameState < 4)
+        {
+            lessThanEndPoint = stage + 1;
+            moreThanEndPoint = stage;
+
+            if (endPoints[lessThanEndPoint] > 0)
+            {
+                endPoints[lessThanEndPoint] = endPoints[lessThanEndPoint] * -1;
+            }
+            if (endPoints[moreThanEndPoint] > 0)
+            {
+                endPoints[moreThanEndPoint] = endPoints[moreThanEndPoint] * -1;
+            }
+        }
+        else if (gameState > 4)
+        {
+            lessThanEndPoint = stage;
+            moreThanEndPoint = stage + 1;
+            if (endPoints[lessThanEndPoint] < 0)
+            {
+                endPoints[lessThanEndPoint] = endPoints[lessThanEndPoint] * -1;
+            }
+            if (endPoints[moreThanEndPoint] < 0)
+            {
+                endPoints[moreThanEndPoint] = endPoints[moreThanEndPoint] * -1;
+            }
+        }
     }
 }
