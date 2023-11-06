@@ -5,6 +5,12 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    /*notes: to Do
+     * make sword swing around middle while in air at -0.53(middle of sword)
+     * change scene and update Ui to state
+     * 
+     */
+
     [SerializeField] float speed;
 
     int swordPlace = 1;
@@ -42,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] GameObject playerSprite;
 
     [SerializeField] Animator anim;
+
+    
     private void Start()
     {
         anim = GetComponentInChildren<Animator>();
@@ -78,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            Debug.Log("Not Running");
+            //Debug.Log("Not Running");
             anim.SetBool("IsRunning", false);
         }
     }
@@ -102,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
                 }
                 if (swordPlace != 2 && canUse)
                 {
-                    sword.transform.position += new Vector3(0, 0.5f, 0);
+                    sword.transform.position += new Vector3(0, 0.35f, 0);
 
                     swordPlace++;
                     canUse = false;
@@ -125,7 +133,7 @@ public class PlayerMovement : MonoBehaviour
                 }
                 if (swordPlace != 0 && canUse)
                 {
-                    sword.transform.position += new Vector3(0, -0.5f, 0);
+                    sword.transform.position += new Vector3(0, -0.35f, 0);
 
                     swordPlace--;
                     canUse = false;
@@ -133,10 +141,10 @@ public class PlayerMovement : MonoBehaviour
                 }
                 else if(swordPlace == 0 && canUse)
                 {
-                    gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.08f);
-                    gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.412f);
-                    playerSprite.transform.localPosition = new Vector3(0, -0.4153f, 0);
-                    playerSprite.transform.localScale = new Vector3(1, 1.074617f, 1);
+                    gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.24f);
+                    gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.34f);
+                   
+                    anim.SetBool("Crouching", true);
                 }
                 timer += Time.deltaTime;
             }
@@ -148,7 +156,7 @@ public class PlayerMovement : MonoBehaviour
                 if(sword.transform.position == swordOverHeadPlace.transform.position)
                 {
                     
-                    sword.transform.position = new Vector3(swordPlacement.transform.position.x, swordPlacement.transform.position.y + 0.5f, swordPlacement.transform.position.z);
+                    sword.transform.position = new Vector3(swordPlacement.transform.position.x, swordPlacement.transform.position.y + 0.35f, swordPlacement.transform.position.z);
                     sword.transform.rotation = swordPlacement.transform.rotation;
                     canThrow = false;
                 }
@@ -156,25 +164,24 @@ public class PlayerMovement : MonoBehaviour
 
                 gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.9f);
                 gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, 0);
-                playerSprite.transform.localPosition = new Vector3(0, 0, 0);
-                playerSprite.transform.localScale = new Vector3(1, 1.905f, 1);
-
+              
+                anim.SetBool("Crouching", false);
             }
         }
         else if(!hasSword && Input.GetKey(inputs[1]))
         {
-            gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.08f);
-            gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.412f);
+            gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.24f);
+            gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.34f);
 
-            playerSprite.transform.localPosition = new Vector3(0, -0.4153f, 0);
-            playerSprite.transform.localScale = new Vector3(1, 1.074617f, 1);
+            
+            anim.SetBool("Crouching", true);
         }
         else
         {
             gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.9f);
             gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, 0);
-            playerSprite.transform.localPosition = new Vector3(0, 0, 0);
-            playerSprite.transform.localScale = new Vector3(1, 1.905f, 1);
+            
+            anim.SetBool("Crouching", false);
         }
     }
     void PickUpAndThrowSword()
@@ -247,7 +254,11 @@ public class PlayerMovement : MonoBehaviour
         {
             if (!collision.gameObject.transform.parent.GetComponent<Sword>().isInAir)
             {
-                sword = collision.gameObject.transform.parent.gameObject;
+                if (!hasSword)
+                {
+                    sword = collision.gameObject.transform.parent.gameObject;
+                }
+                
             }
             else
             {

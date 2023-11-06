@@ -9,7 +9,7 @@ public class Manager : MonoBehaviour
 
     GameObject PlayerToFollow;
     GameObject playerThatLost;
-    int gameState = 4;
+    [SerializeField]int gameState = 4;
 
     Camera cam;
     [SerializeField] float followSpeed;
@@ -17,7 +17,12 @@ public class Manager : MonoBehaviour
 
     [SerializeField] float maxDistance;
     [SerializeField] float minDistance;
-    
+
+    [SerializeField] float[] endPoints;
+    [SerializeField] float endOfStage;
+    int stage = 0;
+    int lessThanEndPoint;
+    int moreThanEndPoint;
 
     
 
@@ -37,11 +42,42 @@ public class Manager : MonoBehaviour
     {
         if (PlayerToFollow != null)
         {
+            if(gameState >= 4)
+            {
+                lessThanEndPoint = stage;
+                moreThanEndPoint = stage + 1;
+            }
+            else 
+            {
+                lessThanEndPoint = stage + 1;
+                moreThanEndPoint = stage;
+            }
             
-            if(Vector2.Distance(new Vector2(PlayerToFollow.transform.position.x, 0), new Vector2(playerThatLost.transform.position.x, 0)) > maxDistance)
+            if(PlayerToFollow.transform.position.x <= -endPoints[lessThanEndPoint] || PlayerToFollow.transform.position.x >= endPoints[moreThanEndPoint])
+            {
+                if(cam.transform.position.x > 0)
+                {
+                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[stage], cam.transform.position.y, cam.transform.position.z), followSpeed);
+                    if (PlayerToFollow.transform.position.x > endPoints[stage] + endOfStage)
+                    {
+                        gameState++;
+                        changeScene();
+                    }
+                }
+                else
+                {
+                    cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(-endPoints[stage], cam.transform.position.y, cam.transform.position.z), followSpeed);
+                    if (PlayerToFollow.transform.position.x < -endPoints[stage] - endOfStage)
+                    {
+                        gameState--;
+                        changeScene();
+                    }
+                }
+            }
+            else if(Vector2.Distance(new Vector2(PlayerToFollow.transform.position.x, 0), new Vector2(playerThatLost.transform.position.x, 0)) > maxDistance)
             {
                 cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(PlayerToFollow.transform.position.x, cam.transform.position.y, cam.transform.position.z), followSpeed );
-                Debug.Log("Following player");
+                
             }
             else if(Vector2.Distance(new Vector2(PlayerToFollow.transform.position.x, 0), new Vector2(playerThatLost.transform.position.x, 0)) > minDistance)
             {
@@ -98,8 +134,14 @@ public class Manager : MonoBehaviour
             }
         }
     }
-    public void PlusGameStat()
+    /*public void PlusGameStat()
     {
-        gameState += 1;
+        gameState++;
+    }*/
+    void changeScene()
+    {
+        Debug.Log("change Scene");
+        stage += 2;
+        
     }
 }
