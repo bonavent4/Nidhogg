@@ -28,10 +28,14 @@ public class Manager : MonoBehaviour
     [SerializeField] AudioSource outsideMusic;
 
     AudioSource theMusic;
+    AudioSource startTheMusic;
     float goal;
+    float startGoal;
     bool isSlwingMusic;
     bool isSpeedingMusic;
     [SerializeField] float SlowSpeed;
+    [SerializeField] float SuperSlowSpeed;
+    float previousVolume;
     
 
     private void Start()
@@ -40,7 +44,8 @@ public class Manager : MonoBehaviour
     }
     private void Update()
     {
-        SlowlyStopMusic(theMusic, goal);
+        SlowlyStopMusic(theMusic, goal, previousVolume);
+        SlowlyStartMusic(startTheMusic, startGoal);
     }
     private void FixedUpdate()
     {
@@ -183,20 +188,33 @@ public class Manager : MonoBehaviour
     {
         if(gameState == 3 || gameState == 5)
         {
+            Debug.Log("Start Music");
             CantinaMusic.Play();
+            startGoal = CantinaMusic.volume;
+            CantinaMusic.volume = 0;
+            isSpeedingMusic = true;
+            startTheMusic = CantinaMusic;
         }
         else 
         {
+            previousVolume = CantinaMusic.volume;
             isSlwingMusic = true;
             theMusic = CantinaMusic;
             goal = 0;
         }
         if( gameState == 4 || gameState == 2||gameState == 6)
         {
+            Debug.Log("Start Music");
             outsideMusic.Play();
+            startGoal = outsideMusic.volume;
+            outsideMusic.volume = 0;
+            isSpeedingMusic = true;
+            startTheMusic = outsideMusic;
+            
         }
         else
         {
+            previousVolume = outsideMusic.volume;
             isSlwingMusic = true;
             theMusic = outsideMusic;
             goal = 0;
@@ -204,17 +222,18 @@ public class Manager : MonoBehaviour
         }
     }
 
-    void SlowlyStopMusic(AudioSource audio, float goal)
+    void SlowlyStopMusic(AudioSource audio, float goal, float previousV)
     {
         if (isSlwingMusic)
         {
             if(audio.volume > goal)
             {
-                audio.volume -= SlowSpeed * Time.deltaTime;
+                audio.volume -= SuperSlowSpeed * Time.deltaTime;
             }
             else
             {
-                audio.volume = goal;
+                audio.volume = previousV;
+                audio.Stop();
                 isSlwingMusic = false;
             }
         }
@@ -228,20 +247,18 @@ public class Manager : MonoBehaviour
     {
         if (isSpeedingMusic)
         {
-            if (audio.volume > goal)
+            if (audio.volume < goal)
             {
-                audio.volume -= SlowSpeed * Time.deltaTime;
+                
+                audio.volume += SlowSpeed * Time.deltaTime;
             }
             else
             {
                 audio.volume = goal;
-                isSlwingMusic = false;
+                isSpeedingMusic = false;
             }
         }
-        if (isSpeedingMusic)
-        {
-
-        }
+        
 
     }
 
