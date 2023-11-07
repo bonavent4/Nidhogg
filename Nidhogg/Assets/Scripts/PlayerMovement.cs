@@ -49,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] GameObject playerSprite;
 
     [SerializeField] Animator anim;
+    [SerializeField] AudioSource LightsaberSound;
 
     
     private void Start()
@@ -60,36 +61,49 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         JumpAndDuck();
-        MoveSword();
+        if (!isSwinging)
+        {
+            MoveSword();
+        }
+        
         PickUpAndThrowSword();
     }
     private void FixedUpdate()
     {
+        
         Movement();
     }
     void Movement()
     {
-        anim.SetInteger("SwordPlace", swordPlace);
-        if (Input.GetAxis(walkAxis) != 0)
+        if (!isSwinging)
         {
-            
-            anim.SetBool("IsRunning", true);
-            
-            gameObject.transform.position += new Vector3(Input.GetAxis(walkAxis) * speed * Time.deltaTime, 0, 0);
-            if (Input.GetAxis(walkAxis) > 0)
+            anim.SetInteger("SwordPlace", swordPlace);
+            if (Input.GetAxis(walkAxis) != 0)
             {
-                gameObject.transform.rotation = Quaternion.Euler(gameObject.transform.rotation.x, 180, gameObject.transform.rotation.z);
+
+                anim.SetBool("IsRunning", true);
+
+                gameObject.transform.position += new Vector3(Input.GetAxis(walkAxis) * speed * Time.deltaTime, 0, 0);
+                if (Input.GetAxis(walkAxis) > 0)
+                {
+                    gameObject.transform.rotation = Quaternion.Euler(gameObject.transform.rotation.x, 180, gameObject.transform.rotation.z);
+                }
+                else
+                {
+                    gameObject.transform.rotation = Quaternion.Euler(gameObject.transform.rotation.x, 0, gameObject.transform.rotation.z);
+                }
             }
             else
             {
-                gameObject.transform.rotation = Quaternion.Euler(gameObject.transform.rotation.x, 0, gameObject.transform.rotation.z);
+                //Debug.Log("Not Running");
+                anim.SetBool("IsRunning", false);
             }
         }
         else
         {
-            //Debug.Log("Not Running");
             anim.SetBool("IsRunning", false);
         }
+        
     }
     void JumpAndDuck()
     {
@@ -228,20 +242,21 @@ public class PlayerMovement : MonoBehaviour
                 isSwinging = true;
                 anim.SetBool("IsThrusting", true);
                 gameObject.GetComponent<Rigidbody2D>().AddForce(-transform.right * thrustForce);
+                LightsaberSound.Play();
             }
         }
         if (isSwinging)
         {
             if(sword.transform.localPosition != goToPosition && !swordGoingBack)
             {
-                sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, goToPosition, swordSwingTime);
+                sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, goToPosition, swordSwingTime * Time.deltaTime);
             }
             else
             {
                 swordGoingBack = true;
                 if(sword.transform.localPosition != previousPosition)
                 {
-                    sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, previousPosition, swordSwingTime);
+                    sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, previousPosition, swordSwingTime * Time.deltaTime);
                 }
                 else
                 {

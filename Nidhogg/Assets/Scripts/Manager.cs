@@ -7,8 +7,8 @@ public class Manager : MonoBehaviour
 {
     [SerializeField] GameObject[] sevenSquares;
 
-    GameObject PlayerToFollow;
-    GameObject playerThatLost;
+    [SerializeField]GameObject PlayerToFollow;
+    [SerializeField]GameObject playerThatLost;
     [SerializeField]int gameState = 4;
 
     Camera cam;
@@ -24,7 +24,14 @@ public class Manager : MonoBehaviour
     [SerializeField]int lessThanEndPoint;
     [SerializeField]int moreThanEndPoint;
 
-    
+    [SerializeField] AudioSource CantinaMusic;
+    [SerializeField] AudioSource outsideMusic;
+
+    AudioSource theMusic;
+    float goal;
+    bool isSlwingMusic;
+    bool isSpeedingMusic;
+    [SerializeField] float SlowSpeed;
     
 
     private void Start()
@@ -33,7 +40,7 @@ public class Manager : MonoBehaviour
     }
     private void Update()
     {
-        
+        SlowlyStopMusic(theMusic, goal);
     }
     private void FixedUpdate()
     {
@@ -52,12 +59,24 @@ public class Manager : MonoBehaviour
                     cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[moreThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
                     if (PlayerToFollow.transform.position.x > endPoints[moreThanEndPoint] + endOfStage)
                     {
-                         gameState++;
-                          changeScene();
+                        int previousGamestate = gameState;
+                        gameState++;
+                        ChangeState(PlayerToFollow, playerThatLost);
+                        //changeScene();
+                        if((previousGamestate < 4 && previousGamestate > gameState) || (previousGamestate > 4 && previousGamestate < gameState) || previousGamestate == 4)
+                        {
+                            stage += 2;
+                        }
+                        else
+                        {
+                            stage -= 2;
+                        }
+                        Debug.Log(stage);
                         LessThanMoreThanState();
-                        PlayerToFollow.transform.position += new Vector3(endOfStage, 0, 0);
+                        PlayerToFollow.transform.position += new Vector3(2, 0, 0);
                          cam.transform.position = new Vector3(endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z);
-                            
+
+                        music();
                     }
                 }
                 else 
@@ -65,15 +84,25 @@ public class Manager : MonoBehaviour
                     cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
                     if (PlayerToFollow.transform.position.x < endPoints[lessThanEndPoint] - endOfStage)
                     {
-                       
-                          gameState--;
-                          changeScene();
+                        int previousGamestate = gameState;
+                        gameState--;
+                        ChangeState(PlayerToFollow, playerThatLost);
+                        // changeScene();
+                        if ((previousGamestate < 4 && previousGamestate > gameState) || (previousGamestate > 4 && previousGamestate < gameState) || previousGamestate == 4)
+                        {
+                            stage += 2;
+                        }
+                        else
+                        {
+                            stage -= 2;
+                        }
+                        Debug.Log(stage);
                         LessThanMoreThanState();
-                          PlayerToFollow.transform.position += new Vector3(-endOfStage, 0, 0);
+                          PlayerToFollow.transform.position += new Vector3(-2, 0, 0);
                           cam.transform.position = new Vector3(endPoints[moreThanEndPoint], cam.transform.position.y, cam.transform.position.z);
-                            
-                        
 
+
+                        music();
                     }
                 }
             }
@@ -111,7 +140,7 @@ public class Manager : MonoBehaviour
         PlayerToFollow = Player;
         playerThatLost = playerLost;
 
-        if (!Player.GetComponent<PlayerMovement>().isPlayer1)
+        if (Player.GetComponent<PlayerMovement>().isPlayer1)
         {
             foreach (GameObject g in sevenSquares)
             {
@@ -144,9 +173,76 @@ public class Manager : MonoBehaviour
     void changeScene()
     {
         Debug.Log("change Scene");
-        stage += 2;
+        //int previousGameState = ;
+        //if(previousGameState)
+        //stage += 2;
         
         
+    }
+    void music()
+    {
+        if(gameState == 3 || gameState == 5)
+        {
+            CantinaMusic.Play();
+        }
+        else 
+        {
+            isSlwingMusic = true;
+            theMusic = CantinaMusic;
+            goal = 0;
+        }
+        if( gameState == 4 || gameState == 2||gameState == 6)
+        {
+            outsideMusic.Play();
+        }
+        else
+        {
+            isSlwingMusic = true;
+            theMusic = outsideMusic;
+            goal = 0;
+            
+        }
+    }
+
+    void SlowlyStopMusic(AudioSource audio, float goal)
+    {
+        if (isSlwingMusic)
+        {
+            if(audio.volume > goal)
+            {
+                audio.volume -= SlowSpeed * Time.deltaTime;
+            }
+            else
+            {
+                audio.volume = goal;
+                isSlwingMusic = false;
+            }
+        }
+        if (isSpeedingMusic)
+        {
+
+        }
+        
+    }
+    void SlowlyStartMusic(AudioSource audio, float goal)
+    {
+        if (isSpeedingMusic)
+        {
+            if (audio.volume > goal)
+            {
+                audio.volume -= SlowSpeed * Time.deltaTime;
+            }
+            else
+            {
+                audio.volume = goal;
+                isSlwingMusic = false;
+            }
+        }
+        if (isSpeedingMusic)
+        {
+
+        }
+
     }
 
     void LessThanMoreThanState()
