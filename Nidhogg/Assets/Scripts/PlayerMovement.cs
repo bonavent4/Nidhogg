@@ -360,7 +360,7 @@ public class PlayerMovement : MonoBehaviour
             gameObject.transform.position = Landing;
             anim.SetBool("IsDead", false);
 
-            if (sword != null)
+            if(sword != null && hasSword)
             {
                 Destroy(sword);
             }
