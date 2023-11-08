@@ -8,8 +8,8 @@ public class Manager : MonoBehaviour
     [SerializeField] GameObject[] sevenSquares;
 
     [SerializeField]GameObject PlayerToFollow;
-    [SerializeField]GameObject playerThatLost;
-    [SerializeField]int gameState = 4;
+    public GameObject playerThatLost;
+    public int gameState = 4;
 
     Camera cam;
     [SerializeField] float followSpeed;
@@ -18,11 +18,11 @@ public class Manager : MonoBehaviour
     [SerializeField] float maxDistance;
     [SerializeField] float minDistance;
 
-    [SerializeField] float[] endPoints;
+    public float[] endPoints;
     [SerializeField] float endOfStage;
     int stage = 0;
-    [SerializeField]int lessThanEndPoint;
-    [SerializeField]int moreThanEndPoint;
+    public int lessThanEndPoint;
+    public int moreThanEndPoint;
 
     [SerializeField] AudioSource CantinaMusic;
     [SerializeField] AudioSource outsideMusic;
@@ -36,6 +36,8 @@ public class Manager : MonoBehaviour
     [SerializeField] float SlowSpeed;
     [SerializeField] float SuperSlowSpeed;
     float previousVolume;
+
+    
     
 
     private void Start()
@@ -53,7 +55,7 @@ public class Manager : MonoBehaviour
     }
     void followDude()
     {
-        if (PlayerToFollow != null)
+        if (PlayerToFollow != null )
         {
             LessThanMoreThanState();
             
@@ -82,6 +84,7 @@ public class Manager : MonoBehaviour
                          cam.transform.position = new Vector3(endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z);
 
                         music();
+                        playerThatLost.GetComponent<PlayerMovement>().PlayerRespawn();
                     }
                 }
                 else 
@@ -108,10 +111,11 @@ public class Manager : MonoBehaviour
 
 
                         music();
+                        playerThatLost.GetComponent<PlayerMovement>().PlayerRespawn();
                     }
                 }
             }
-            else if(Vector2.Distance(new Vector2(PlayerToFollow.transform.position.x, 0), new Vector2(playerThatLost.transform.position.x, 0)) > maxDistance)
+            else if((Vector2.Distance(new Vector2(PlayerToFollow.transform.position.x, 0), new Vector2(playerThatLost.transform.position.x, 0)) > maxDistance) || playerThatLost.GetComponent<PlayerMovement>().anim.GetBool("IsDead"))
             {
                 cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(PlayerToFollow.transform.position.x, cam.transform.position.y, cam.transform.position.z), followSpeed );
                 

@@ -48,30 +48,53 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] GameObject playerSprite;
 
-    [SerializeField] Animator anim;
+    public Animator anim;
     [SerializeField] AudioSource LightsaberSound;
 
+    Explode explode;
+
+    Manager manager;
+
+    [SerializeField] GameObject OtherPlayer;
+    [SerializeField] float offset;
+    [SerializeField] float BehindOffset;
+    [SerializeField] float maxDistance;
+
+    [SerializeField] GameObject[] SwordVarients;
     
     private void Start()
     {
         anim = GetComponentInChildren<Animator>();
+        explode = GetComponentInChildren<Explode>();
+        manager = FindObjectOfType<Manager>();
+
+        sword = Instantiate(SwordVarients[Random.Range(0, SwordVarients.Length)], gameObject.transform.position, gameObject.transform.rotation); ;
+        //sword.transform.parent = null;
+        PickupSword();
     }
 
 
     private void Update()
     {
-        JumpAndDuck();
-        if (!isSwinging)
+        if (!anim.GetBool("IsDead"))
         {
-            MoveSword();
+            JumpAndDuck();
+            if (!isSwinging)
+            {
+                MoveSword();
+            }
+
+            PickUpAndThrowSword();
+            CheckIfTooFarApart();
         }
         
-        PickUpAndThrowSword();
     }
     private void FixedUpdate()
     {
-        
-        Movement();
+        if (!anim.GetBool("IsDead"))
+        {
+            Movement();
+        }
     }
     void Movement()
     {
@@ -201,20 +224,9 @@ public class PlayerMovement : MonoBehaviour
     }
     void PickUpAndThrowSword()
     {
-        if(sword != null && !hasSword && Input.GetKeyDown(inputs[2]) && !sword.GetComponent<Sword>().isInHands && !sword.GetComponent<Sword>().isInAir)
+        if(sword != null && !hasSword && anim.GetBool("Crouching") && !sword.GetComponent<Sword>().isInHands && !sword.GetComponent<Sword>().isInAir)
         {
-            sword.transform.parent = swordPlacement.transform;
-            sword.transform.position = swordPlacement.transform.position;
-            sword.transform.rotation = swordPlacement.transform.rotation;
-
-            sword.GetComponent<Sword>().isInHands = true;
-
-            sword.GetComponent<Rigidbody2D>().isKinematic = true;
-            sword.GetComponent<Sword>().SwordHolder = gameObject;
-
-            hasSword = true;
-
-            swordPlace = 1;
+            PickupSword();
         }
         if(hasSword && Input.GetKeyDown(inputs[2]) && !isSwinging)
         {
@@ -269,6 +281,21 @@ public class PlayerMovement : MonoBehaviour
         }
         
     }
+    void PickupSword()
+    {
+        sword.transform.parent = swordPlacement.transform;
+        sword.transform.position = swordPlacement.transform.position;
+        sword.transform.rotation = swordPlacement.transform.rotation;
+
+        sword.GetComponent<Sword>().isInHands = true;
+
+        sword.GetComponent<Rigidbody2D>().isKinematic = true;
+        sword.GetComponent<Sword>().SwordHolder = gameObject;
+
+        hasSword = true;
+
+        swordPlace = 1;
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -276,7 +303,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (!collision.gameObject.transform.parent.GetComponent<Sword>().isInAir)
             {
-                if (!hasSword)
+                if (!hasSword && !collision.gameObject.transform.parent.gameObject.GetComponent<Sword>().isInHands)
                 {
                     sword = collision.gameObject.transform.parent.gameObject;
                 }
@@ -292,16 +319,64 @@ public class PlayerMovement : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.gameObject == sword)
+        if(collision.gameObject == sword && !hasSword && !collision.gameObject.GetComponent<Sword>().isInHands)
         {
             sword = null;
         }
     }
-
+    
     public void Die()
     {
-        Debug.Log(gameObject.name + " Died");
+        if (!anim.GetBool("IsDead"))
+        {
+            Debug.Log(gameObject.name + " Died");
+            sword.gameObject.layer = 10;
+            sword.transform.parent = null;
+            sword.GetComponent<Rigidbody2D>().isKinematic = false;
+            sword.GetComponent<Sword>().isInHands = false;
+            hasSword = false;
+            
+            sword = null;
 
+            explode.ExplodeInPieces();
+            anim.SetBool("IsDead", true); 
+        }
+    }
 
+    public void PlayerRespawn()
+    {
+        if(manager.gameState != 1 && manager.gameState != 7)
+        {
+            Vector3 Landing = new Vector3(OtherPlayer.transform.position.x + offset, OtherPlayer.transform.position.y + 10, OtherPlayer.transform.position.z);
+            if (Landing.x > manager.endPoints[manager.moreThanEndPoint])
+            {
+                Landing = new Vector3(OtherPlayer.transform.position.x + BehindOffset, OtherPlayer.transform.position.y + 10, OtherPlayer.transform.position.z);
+            }
+            else if (Landing.x < manager.endPoints[manager.lessThanEndPoint])
+            {
+                Landing = new Vector3(OtherPlayer.transform.position.x - BehindOffset, OtherPlayer.transform.position.y + 10, OtherPlayer.transform.position.z);
+            }
+
+            gameObject.transform.position = Landing;
+            anim.SetBool("IsDead", false);
+
+            if (sword != null)
+            {
+                Destroy(sword);
+            }
+
+            sword = Instantiate(SwordVarients[Random.Range(0, SwordVarients.Length)], gameObject.transform.position, gameObject.transform.rotation); ;
+            //sword.transform.parent = null;
+            PickupSword();
+        }
+    }
+
+    void CheckIfTooFarApart()
+    {
+        if(gameObject == manager.playerThatLost && Vector2.Distance(new Vector2(gameObject.transform.position.x,0), new Vector2(OtherPlayer.transform.position.x,0)) > maxDistance)
+        {
+            
+            PlayerRespawn();
+        }
     }
 }

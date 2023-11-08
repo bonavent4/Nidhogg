@@ -13,6 +13,10 @@ public class Sword : MonoBehaviour
 
     Manager manager;
 
+    [SerializeField] GameObject Holder;
+    [SerializeField] GameObject HolderPrefab;
+
+    [SerializeField] float knockBackForce;
 
 
     private void Start()
@@ -21,10 +25,12 @@ public class Sword : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        gameObject.layer = 7;
         gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
         isInAir = false;
-
+        gameObject.transform.parent = null;
+        Destroy(Holder);
         
     }
     private void OnTriggerEnter2D(Collider2D collision)
@@ -33,7 +39,7 @@ public class Sword : MonoBehaviour
         {
             if (collision.gameObject != SwordHolder)
             {
-
+                
                 if (isInAir)
                 {
                     collision.gameObject.GetComponent<PlayerMovement>().Die();
@@ -43,7 +49,11 @@ public class Sword : MonoBehaviour
 
                     manager.ChangeState(SwordHolder, collision.gameObject);
 
+
                     isInAir = false;
+
+                    gameObject.transform.parent = null;
+                    
                 }
                 else if(isInHands)
                 {
@@ -56,6 +66,8 @@ public class Sword : MonoBehaviour
         {
             Debug.Log("Hit Sword ");
             SwordHolder.GetComponent<PlayerMovement>().swordGoingBack = true;
+            SwordHolder.GetComponent<Rigidbody2D>().AddForce(-transform.forward * 500);
+            Debug.Log("KncokBack");
         }
 
     }
@@ -64,7 +76,12 @@ public class Sword : MonoBehaviour
     {
         if (isInAir)
         {
-            transform.Rotate(Vector3.forward * (speed * Time.deltaTime));
+            Holder = Instantiate(HolderPrefab, gameObject.transform);
+            Holder.transform.parent = null;
+            transform.parent = Holder.transform;
+            Holder.transform.Rotate(Vector3.forward * (speed * Time.deltaTime));
+            gameObject.transform.parent = null;
+            Destroy(Holder);
         }
     }
 }
