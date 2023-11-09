@@ -18,7 +18,7 @@ public class Sword : MonoBehaviour
 
     [SerializeField] float knockBackForce;
 
-
+    [SerializeField] AudioSource LightsaberHitSound;
     private void Start()
     {
         manager = FindObjectOfType<Manager>();
@@ -75,6 +75,7 @@ public class Sword : MonoBehaviour
                 SwordHolder.GetComponent<Rigidbody2D>().AddForce(transform.right * 265);
                 SwordHolder.GetComponent<PlayerMovement>().isGettingKnockedBack = true;
                 Debug.Log("KncokBack");
+                LightsaberHitSound.Play();
             }
             else if (isInAir)
             {

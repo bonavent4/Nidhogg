@@ -21,6 +21,11 @@ public class Sarlacc : MonoBehaviour
                 SceneManager.LoadScene(1);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(1);
+        }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {

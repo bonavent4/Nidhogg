@@ -26,9 +26,16 @@ public class Manager : MonoBehaviour
 
     [SerializeField] MusicHandler[] musicHandlers;
     public int previousGamestate;
+
+    [SerializeField] GameObject RedArrow;
+    [SerializeField] GameObject BlueArrow;
+
+   
     private void Start()
     {
         cam = FindObjectOfType<Camera>();
+
+        
     }
     private void Update()
     {
@@ -148,24 +155,51 @@ public class Manager : MonoBehaviour
             foreach (GameObject g in sevenSquares)
             {
                 g.GetComponent<Image>().color = Color.white;
+                
             }
             for (int i = sevenSquares.Length - 1; i > gameState-2; i--)
             {
                 //Debug.Log(i);
                 //Debug.Log(sevenSquares.Length);
                 sevenSquares[i].GetComponent<Image>().color = Color.red;
+               
             }
+            if(gameState == 7 || gameState == 1)
+            {
+                BlueArrow.SetActive(false);
+                RedArrow.SetActive(false);
+            }
+            else
+            {
+                BlueArrow.SetActive(false);
+                RedArrow.SetActive(true);
+            }
+            
         }
         else
         {
             foreach (GameObject g in sevenSquares)
             {
                 g.GetComponent<Image>().color = Color.white;
+                
             }
             for (int i = gameState-1; i > -1; i--)
             {
                 
                 sevenSquares[i].GetComponent<Image>().color = Color.blue;
+
+                
+            }
+            
+            if (gameState == 7 || gameState == 1)
+            {
+                BlueArrow.SetActive(false);
+                RedArrow.SetActive(false);
+            }
+            else
+            {
+                BlueArrow.SetActive(true);
+                RedArrow.SetActive(false);
             }
         }
     }
