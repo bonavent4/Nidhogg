@@ -25,11 +25,12 @@ public class Sword : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        gameObject.layer = 7;
+        //gameObject.layer = 7;
+        gameObject.transform.parent = null;
         gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
         gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
         isInAir = false;
-        gameObject.transform.parent = null;
+        
         Destroy(Holder);
         
     }
@@ -53,6 +54,8 @@ public class Sword : MonoBehaviour
                     isInAir = false;
 
                     gameObject.transform.parent = null;
+
+                   
                     
                 }
                 else if(isInHands)
@@ -62,12 +65,27 @@ public class Sword : MonoBehaviour
                 }
             }
         }
-        if (collision.gameObject.tag == "SwordHolder" && isInHands && collision.gameObject.GetComponent<Sword>().isInHands)
+        if (collision.gameObject.tag == "SwordHolder")
         {
-            Debug.Log("Hit Sword ");
-            SwordHolder.GetComponent<PlayerMovement>().swordGoingBack = true;
-            SwordHolder.GetComponent<Rigidbody2D>().AddForce(-transform.forward * 500);
-            Debug.Log("KncokBack");
+            if (isInHands && collision.gameObject.GetComponent<Sword>().isInHands)
+            {
+                SwordHolder.GetComponent<PlayerMovement>().swordGoingBack = true;
+
+                SwordHolder.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                SwordHolder.GetComponent<Rigidbody2D>().AddForce(transform.right * 265);
+                SwordHolder.GetComponent<PlayerMovement>().isGettingKnockedBack = true;
+                Debug.Log("KncokBack");
+            }
+            else if (isInAir)
+            {
+                isInAir = false;
+                gameObject.transform.parent = null;
+                gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
+                gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+                
+                
+                
+            }
         }
 
     }

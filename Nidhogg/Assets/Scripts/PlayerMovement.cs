@@ -11,7 +11,10 @@ public class PlayerMovement : MonoBehaviour
      * 
      */
 
-    [SerializeField] float speed;
+    [SerializeField] float Walkspeed;
+    [SerializeField] float CrouchSpeed;
+    float speed;
+      
 
     int swordPlace = 1;
     [SerializeField] GameObject swordPlacement;
@@ -28,7 +31,9 @@ public class PlayerMovement : MonoBehaviour
     //RaycastHit2D hit;
     public bool isOnGround;
 
-    [SerializeField] float jumpForce;
+    [SerializeField] float WalkjumpForce;
+    [SerializeField] float CrouchJumpForce;
+    float jumpForce;
     [SerializeField] float thrustForce;
     //bool done;
     bool canUse;
@@ -61,9 +66,28 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float maxDistance;
 
     [SerializeField] GameObject[] SwordVarients;
-    
+
+    public bool isGettingKnockedBack;
+
+    float knockBackTimer;
+    [SerializeField] float TimeBeforeConcience;
+
+    bool hasSlid;
+    [SerializeField] float slidePower;
+
+    float CrouchTimer;
+     float MaxTimeBeforeSlide = 0.1f;
+
+    [SerializeField] GameObject CrouchSwordPosition;
+
+    bool haveResetCrouch;
+
+    float UnSlideTimer;
+    [SerializeField] float TimeBeforUnSlide;
+    bool CanStandFromSlide = true;
     private void Start()
     {
+        speed = Walkspeed;
         anim = GetComponentInChildren<Animator>();
         explode = GetComponentInChildren<Explode>();
         manager = FindObjectOfType<Manager>();
@@ -76,7 +100,66 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (!anim.GetBool("IsDead"))
+        if (isGettingKnockedBack)
+        {
+            if(knockBackTimer < TimeBeforeConcience)
+            {
+
+                knockBackTimer += Time.deltaTime;
+            }
+            else
+            {
+                isGettingKnockedBack = false;
+                knockBackTimer = 0;
+            }
+        }
+
+
+        if (anim.GetBool("Crouching"))
+        {
+            if (!hasSlid)
+            {
+                haveResetCrouch = false;
+                CrouchTimer += Time.deltaTime;
+                if (anim.GetBool("IsRunning") && CrouchTimer < MaxTimeBeforeSlide)
+                {
+                    gameObject.GetComponent<Rigidbody2D>().AddForce(-transform.right * slidePower);
+                    hasSlid = true;
+                    CrouchTimer = 0;
+                    CanStandFromSlide = false;
+                }
+                
+            }
+            else if(!CanStandFromSlide)
+            {
+                if(UnSlideTimer < TimeBeforUnSlide)
+                {
+                    UnSlideTimer += Time.deltaTime;
+                }
+                else
+                {
+                    CanStandFromSlide = true;
+                    UnSlideTimer = 0;
+                }
+            }
+            speed = CrouchSpeed;
+            jumpForce = CrouchJumpForce;
+        }
+        else
+        {
+            speed = Walkspeed;
+            jumpForce = WalkjumpForce;
+            hasSlid = false;
+            CrouchTimer = 0;
+            if (!haveResetCrouch)
+            {
+                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                haveResetCrouch = true;
+            }
+        }
+        
+
+        if (!anim.GetBool("IsDead") && !isGettingKnockedBack)
         {
             JumpAndDuck();
             if (!isSwinging)
@@ -91,7 +174,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (!anim.GetBool("IsDead"))
+        if (!anim.GetBool("IsDead") && !isGettingKnockedBack && CanStandFromSlide)
         {
             Movement();
         }
@@ -133,7 +216,7 @@ public class PlayerMovement : MonoBehaviour
         if (isOnGround && Input.GetKeyDown(inputs[3]))
         {
             gameObject.GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce);
-            isOnGround = false;
+           // isOnGround = false;
         }
     }
     void MoveSword()
@@ -146,7 +229,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     canUse = true;
                 }
-                if (swordPlace != 2 && canUse)
+                if (swordPlace != 2 && canUse && !anim.GetBool("Crouching"))
                 {
                     sword.transform.position += new Vector3(0, 0.35f, 0);
 
@@ -169,7 +252,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     canUse = true;
                 }
-                if (swordPlace != 0 && canUse)
+                if (swordPlace != 0 && canUse && !anim.GetBool("Crouching"))
                 {
                     sword.transform.position += new Vector3(0, -0.35f, 0);
 
@@ -179,14 +262,17 @@ public class PlayerMovement : MonoBehaviour
                 }
                 else if(swordPlace == 0 && canUse)
                 {
-                    gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.24f);
-                    gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.34f);
+                    gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.1717f);
+                    gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.37410f);
                    
                     anim.SetBool("Crouching", true);
+
+                    sword.transform.position = CrouchSwordPosition.transform.position;
+                    sword.transform.rotation = CrouchSwordPosition.transform.rotation;
                 }
                 timer += Time.deltaTime;
             }
-            else
+            else if(CanStandFromSlide)
             {
                 canUse = true;
                 timer = 0;
@@ -204,22 +290,41 @@ public class PlayerMovement : MonoBehaviour
                 gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, 0);
               
                 anim.SetBool("Crouching", false);
+                
+
+                if (swordPlace == 0)
+                {
+                    sword.transform.position = new Vector3(swordPlacement.transform.position.x, swordPlacement.transform.position.y - 0.35f, swordPlacement.transform.position.z);
+                    sword.transform.rotation = swordPlacement.transform.rotation;
+                }
             }
         }
         else if(!hasSword && Input.GetKey(inputs[1]))
         {
-            gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.24f);
-            gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.34f);
+            gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.1717f);
+            gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, -0.37410f);
 
-            
+
             anim.SetBool("Crouching", true);
+            if(sword != null)
+            {
+                sword.transform.position = CrouchSwordPosition.transform.position;
+                sword.transform.rotation = CrouchSwordPosition.transform.rotation;
+            }
+            
         }
-        else
+        else if(CanStandFromSlide)
         {
             gameObject.GetComponent<BoxCollider2D>().size = new Vector2(1, 1.9f);
             gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, 0);
             
             anim.SetBool("Crouching", false);
+            if(swordPlace == 0)
+            {
+                sword.transform.position = new Vector3(swordPlacement.transform.position.x, swordPlacement.transform.position.y - 0.35f, swordPlacement.transform.position.z);
+                sword.transform.rotation = swordPlacement.transform.rotation;
+            }
+            
         }
     }
     void PickUpAndThrowSword()
@@ -228,7 +333,7 @@ public class PlayerMovement : MonoBehaviour
         {
             PickupSword();
         }
-        if(hasSword && Input.GetKeyDown(inputs[2]) && !isSwinging)
+        if (hasSword && Input.GetKeyDown(inputs[2]) && !isSwinging && !anim.GetBool("Crouching"))
         {
             if (canThrow && (swordPlace == 2))
             {
@@ -309,11 +414,11 @@ public class PlayerMovement : MonoBehaviour
                 }
                 
             }
-            else
+           /* else
             {
                 
                 Die();
-            }
+            }*/
             
         }
     }
@@ -330,10 +435,14 @@ public class PlayerMovement : MonoBehaviour
         if (!anim.GetBool("IsDead"))
         {
             Debug.Log(gameObject.name + " Died");
-            sword.gameObject.layer = 10;
-            sword.transform.parent = null;
-            sword.GetComponent<Rigidbody2D>().isKinematic = false;
-            sword.GetComponent<Sword>().isInHands = false;
+            //sword.gameObject.layer = 10;
+            if(sword!= null)
+            {
+                sword.transform.parent = null;
+                sword.GetComponent<Rigidbody2D>().isKinematic = false;
+                sword.GetComponent<Sword>().isInHands = false;
+            }
+            
             hasSword = false;
             
             sword = null;

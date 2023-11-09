@@ -24,30 +24,15 @@ public class Manager : MonoBehaviour
     public int lessThanEndPoint;
     public int moreThanEndPoint;
 
-    [SerializeField] AudioSource CantinaMusic;
-    [SerializeField] AudioSource outsideMusic;
-
-    AudioSource theMusic;
-    AudioSource startTheMusic;
-    float goal;
-    float startGoal;
-    bool isSlwingMusic;
-    bool isSpeedingMusic;
-    [SerializeField] float SlowSpeed;
-    [SerializeField] float SuperSlowSpeed;
-    float previousVolume;
-
-    
-    
-
+    [SerializeField] MusicHandler[] musicHandlers;
+    public int previousGamestate;
     private void Start()
     {
         cam = FindObjectOfType<Camera>();
     }
     private void Update()
     {
-        SlowlyStopMusic(theMusic, goal, previousVolume);
-        SlowlyStartMusic(startTheMusic, startGoal);
+       
     }
     private void FixedUpdate()
     {
@@ -66,7 +51,7 @@ public class Manager : MonoBehaviour
                     cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[moreThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
                     if (PlayerToFollow.transform.position.x > endPoints[moreThanEndPoint] + endOfStage)
                     {
-                        int previousGamestate = gameState;
+                        previousGamestate = gameState;
                         gameState++;
                         ChangeState(PlayerToFollow, playerThatLost);
                         //changeScene();
@@ -83,8 +68,14 @@ public class Manager : MonoBehaviour
                         PlayerToFollow.transform.position += new Vector3(2, 0, 0);
                          cam.transform.position = new Vector3(endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z);
 
-                        music();
+                        
                         playerThatLost.GetComponent<PlayerMovement>().PlayerRespawn();
+                        foreach (MusicHandler m in musicHandlers)
+                        {
+                             m.music();
+                            
+                        }
+                        
                     }
                 }
                 else 
@@ -92,7 +83,7 @@ public class Manager : MonoBehaviour
                     cam.transform.position = Vector3.MoveTowards(cam.transform.position, new Vector3(endPoints[lessThanEndPoint], cam.transform.position.y, cam.transform.position.z), followSpeed);
                     if (PlayerToFollow.transform.position.x < endPoints[lessThanEndPoint] - endOfStage)
                     {
-                        int previousGamestate = gameState;
+                        previousGamestate = gameState;
                         gameState--;
                         ChangeState(PlayerToFollow, playerThatLost);
                         // changeScene();
@@ -109,8 +100,11 @@ public class Manager : MonoBehaviour
                           PlayerToFollow.transform.position += new Vector3(-2, 0, 0);
                           cam.transform.position = new Vector3(endPoints[moreThanEndPoint], cam.transform.position.y, cam.transform.position.z);
 
-
-                        music();
+                        foreach (MusicHandler m in musicHandlers)
+                        {
+                            m.music();
+                        }
+                        
                         playerThatLost.GetComponent<PlayerMovement>().PlayerRespawn();
                     }
                 }
@@ -159,7 +153,7 @@ public class Manager : MonoBehaviour
             {
                 //Debug.Log(i);
                 //Debug.Log(sevenSquares.Length);
-                sevenSquares[i].GetComponent<Image>().color = Color.blue;
+                sevenSquares[i].GetComponent<Image>().color = Color.red;
             }
         }
         else
@@ -171,7 +165,7 @@ public class Manager : MonoBehaviour
             for (int i = gameState-1; i > -1; i--)
             {
                 
-                sevenSquares[i].GetComponent<Image>().color = Color.red;
+                sevenSquares[i].GetComponent<Image>().color = Color.blue;
             }
         }
     }
@@ -188,83 +182,9 @@ public class Manager : MonoBehaviour
         
         
     }
-    void music()
-    {
-        if(gameState == 3 || gameState == 5)
-        {
-            Debug.Log("Start Music");
-            CantinaMusic.Play();
-            startGoal = CantinaMusic.volume;
-            CantinaMusic.volume = 0;
-            isSpeedingMusic = true;
-            startTheMusic = CantinaMusic;
-        }
-        else 
-        {
-            previousVolume = CantinaMusic.volume;
-            isSlwingMusic = true;
-            theMusic = CantinaMusic;
-            goal = 0;
-        }
-        if( gameState == 4 || gameState == 2||gameState == 6)
-        {
-            Debug.Log("Start Music");
-            outsideMusic.Play();
-            startGoal = outsideMusic.volume;
-            outsideMusic.volume = 0;
-            isSpeedingMusic = true;
-            startTheMusic = outsideMusic;
-            
-        }
-        else
-        {
-            previousVolume = outsideMusic.volume;
-            isSlwingMusic = true;
-            theMusic = outsideMusic;
-            goal = 0;
-            
-        }
-    }
+   
 
-    void SlowlyStopMusic(AudioSource audio, float goal, float previousV)
-    {
-        if (isSlwingMusic)
-        {
-            if(audio.volume > goal)
-            {
-                audio.volume -= SuperSlowSpeed * Time.deltaTime;
-            }
-            else
-            {
-                audio.volume = previousV;
-                audio.Stop();
-                isSlwingMusic = false;
-            }
-        }
-        if (isSpeedingMusic)
-        {
-
-        }
-        
-    }
-    void SlowlyStartMusic(AudioSource audio, float goal)
-    {
-        if (isSpeedingMusic)
-        {
-            if (audio.volume < goal)
-            {
-                
-                audio.volume += SlowSpeed * Time.deltaTime;
-            }
-            else
-            {
-                audio.volume = goal;
-                isSpeedingMusic = false;
-            }
-        }
-        
-
-    }
+   
 
     void LessThanMoreThanState()
     {
