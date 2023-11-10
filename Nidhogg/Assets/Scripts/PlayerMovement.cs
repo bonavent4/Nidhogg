@@ -309,7 +309,6 @@ public class PlayerMovement : MonoBehaviour
         if (isOnGround && Input.GetKeyDown(inputs[3]))
         {
             gameObject.GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpForce);
-           // isOnGround = false;
         }
     }
     void MoveSword()
@@ -373,7 +372,8 @@ public class PlayerMovement : MonoBehaviour
                 if(sword.transform.position == swordOverHeadPlace.transform.position)
                 {
                     
-                    sword.transform.position = new Vector3(swordPlacement.transform.position.x, swordPlacement.transform.position.y + 0.35f, swordPlacement.transform.position.z);
+                    sword.transform.position = new Vector3(swordPlacement.transform.position.x, 
+                        swordPlacement.transform.position.y + 0.35f, swordPlacement.transform.position.z);
                     sword.transform.rotation = swordPlacement.transform.rotation;
                     canThrow = false;
                 }
@@ -387,7 +387,8 @@ public class PlayerMovement : MonoBehaviour
 
                 if (swordPlace == 0)
                 {
-                    sword.transform.position = new Vector3(swordPlacement.transform.position.x, swordPlacement.transform.position.y - 0.35f, swordPlacement.transform.position.z);
+                    sword.transform.position = new Vector3(swordPlacement.transform.position.x, 
+                        swordPlacement.transform.position.y - 0.35f, swordPlacement.transform.position.z);
                     sword.transform.rotation = swordPlacement.transform.rotation;
                 }
             }
@@ -414,7 +415,8 @@ public class PlayerMovement : MonoBehaviour
             anim.SetBool("Crouching", false);
             if(swordPlace == 0)
             {
-                sword.transform.position = new Vector3(swordPlacement.transform.position.x, swordPlacement.transform.position.y - 0.35f, swordPlacement.transform.position.z);
+                sword.transform.position = new Vector3(swordPlacement.transform.position.x, 
+                    swordPlacement.transform.position.y - 0.35f, swordPlacement.transform.position.z);
                 sword.transform.rotation = swordPlacement.transform.rotation;
             }
             
@@ -422,7 +424,8 @@ public class PlayerMovement : MonoBehaviour
     }
     void PickUpAndThrowSword()
     {
-        if(sword != null && !hasSword && anim.GetBool("Crouching") && !sword.GetComponent<Sword>().isInHands && !sword.GetComponent<Sword>().isInAir)
+        if(sword != null && !hasSword && anim.GetBool("Crouching") && !sword.GetComponent<Sword>().isInHands 
+            && !sword.GetComponent<Sword>().isInAir)
         {
             PickupSword();
         }
@@ -448,7 +451,8 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 previousPosition = sword.transform.localPosition;
-                goToPosition = new Vector3(sword.transform.localPosition.x - swordSwingOffset, sword.transform.localPosition.y, sword.transform.localPosition.z);
+                goToPosition = new Vector3(sword.transform.localPosition.x - swordSwingOffset, sword.transform.localPosition.y, 
+                    sword.transform.localPosition.z);
                 isSwinging = true;
                 anim.SetBool("IsThrusting", true);
                 gameObject.GetComponent<Rigidbody2D>().AddForce(-transform.right * thrustForce);
@@ -459,14 +463,16 @@ public class PlayerMovement : MonoBehaviour
         {
             if(sword.transform.localPosition != goToPosition && !swordGoingBack)
             {
-                sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, goToPosition, swordSwingTime * Time.deltaTime);
+                sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, goToPosition, 
+                    swordSwingTime * Time.deltaTime);
             }
             else
             {
                 swordGoingBack = true;
                 if(sword.transform.localPosition != previousPosition)
                 {
-                    sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, previousPosition, swordSwingTime * Time.deltaTime);
+                    sword.transform.localPosition = Vector3.MoveTowards(sword.transform.localPosition, previousPosition, 
+                        swordSwingTime * Time.deltaTime);
                 }
                 else
                 {
