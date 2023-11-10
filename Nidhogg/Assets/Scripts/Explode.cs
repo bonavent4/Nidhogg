@@ -33,5 +33,7 @@ public class Explode : MonoBehaviour
         CurrentPart.GetComponent<Rigidbody2D>().AddForce((transform.up * ThrowForce * 2) + (transform.right * Random.Range(-1f, 1f) * ThrowForce));
 
         CurrentPart.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-100, 100);
+
+        CurrentPart.GetComponent<SpriteRenderer>().sortingOrder = 11;
     }
 }

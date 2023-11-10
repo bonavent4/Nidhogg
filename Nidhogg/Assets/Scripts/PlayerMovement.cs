@@ -102,6 +102,8 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isHeadShot;
 
+    [SerializeField] GameObject DownArrow;
+
     private void Start()
     {
         speed = Walkspeed;
@@ -122,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
             ColorNumber += 1;
         }
         ChooseText.text = "Choosing Color";
-        ChooseText.color = Color.red;
+        ChooseText.color = Color.white;
     }
 
 
@@ -168,6 +170,7 @@ public class PlayerMovement : MonoBehaviour
                 LightsaberSound.Play();
                 MenuSword.GetComponent<Animator>().SetTrigger("Light");
                 MenuSword.GetComponent<Image>().color = colors[ColorNumber];
+                
 
             }
             if (Input.GetKeyDown(inputs[2]))
@@ -178,12 +181,13 @@ public class PlayerMovement : MonoBehaviour
                     ChooseText.text = "Locked";
                     ChooseText.color = Color.green;
                     LightsaberFinalColor = colors[ColorNumber];
+                    DownArrow.GetComponent<SpriteRenderer>().color = LightsaberFinalColor;
                 }
                 else
                 {
                     hasChosenColor = false;
                     ChooseText.text = "Choosing Color";
-                    ChooseText.color = Color.red;
+                    ChooseText.color = Color.white;
                 }
                 
             }
