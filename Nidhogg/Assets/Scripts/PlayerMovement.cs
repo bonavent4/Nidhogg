@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
     float speed;
       
 
-    int swordPlace = 1;
+    public int swordPlace = 1;
     [SerializeField] GameObject swordPlacement;
     [SerializeField] Transform swordOverHeadPlace;
     public GameObject sword;
@@ -99,7 +99,9 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI ChooseText;
 
     public Color LightsaberFinalColor;
-    
+
+    public bool isHeadShot;
+
     private void Start()
     {
         speed = Walkspeed;
@@ -521,7 +523,7 @@ public class PlayerMovement : MonoBehaviour
     
     public void Die()
     {
-        if (!anim.GetBool("IsDead"))
+        if (!anim.GetBool("IsDead") && !anim.GetBool("GotHeadShot"))
         {
             Debug.Log(gameObject.name + " Died");
             //sword.gameObject.layer = 10;
@@ -538,13 +540,26 @@ public class PlayerMovement : MonoBehaviour
             
             sword = null;
 
-            explode.ExplodeInPieces();
-            anim.SetBool("IsDead", true); 
+            
+
+            
+            if (isHeadShot)
+            {
+                anim.SetBool("GotHeadShot", true);
+                explode.ExplodeInHeadPiece();
+                isHeadShot = false;
+            }
+            else
+            {
+                explode.ExplodeInPieces();
+            }
+            anim.SetBool("IsDead", true);
         }
     }
 
     public void PlayerRespawn()
     {
+        Debug.Log("Respawning");
         if(manager.gameState != 1 && manager.gameState != 7)
         {
             Vector3 Landing = new Vector3(OtherPlayer.transform.position.x + offset, OtherPlayer.transform.position.y + 10, OtherPlayer.transform.position.z);
@@ -559,6 +574,7 @@ public class PlayerMovement : MonoBehaviour
 
             gameObject.transform.position = Landing;
             anim.SetBool("IsDead", false);
+            anim.SetBool("GotHeadShot", false);
 
             if(sword != null && hasSword)
             {

@@ -44,7 +44,9 @@ public class Sword : MonoBehaviour
                 
                 if (isInAir)
                 {
+                    collision.gameObject.GetComponent<PlayerMovement>().isHeadShot = true;
                     collision.gameObject.GetComponent<PlayerMovement>().Die();
+                    
 
                     gameObject.transform.GetComponent<Rigidbody2D>().gravityScale = 1;
                     gameObject.transform.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
@@ -61,6 +63,16 @@ public class Sword : MonoBehaviour
                 }
                 else if(isInHands)
                 {
+                    
+                    if(SwordHolder.GetComponent<PlayerMovement>().swordPlace == 2)
+                    {
+                        collision.gameObject.GetComponent<PlayerMovement>().isHeadShot = true;
+                    }
+                    else
+                    {
+                        collision.gameObject.GetComponent<PlayerMovement>().isHeadShot = false;
+
+                    }
                     collision.gameObject.GetComponent<PlayerMovement>().Die();
                     manager.ChangeState(SwordHolder, collision.gameObject);
                 }

@@ -25,4 +25,13 @@ public class Explode : MonoBehaviour
 
         }
    }
+
+    public void ExplodeInHeadPiece()
+    {
+        CurrentPart = Instantiate(bodyParts[1], transform.position, Quaternion.Euler(0, 0, Random.Range(0f, 360f)));
+        //CurrentPart.transform.Rotate(new Vector3(0, 0, Random.Range(-180, 180)));
+        CurrentPart.GetComponent<Rigidbody2D>().AddForce((transform.up * ThrowForce * 2) + (transform.right * Random.Range(-1f, 1f) * ThrowForce));
+
+        CurrentPart.GetComponent<Rigidbody2D>().angularVelocity = Random.Range(-100, 100);
+    }
 }
