@@ -161,8 +161,8 @@ public class Manager : MonoBehaviour
             {
                 //Debug.Log(i);
                 //Debug.Log(sevenSquares.Length);
-                sevenSquares[i].GetComponent<Image>().color = Color.red;
-               
+                sevenSquares[i].GetComponent<Image>().color = Player.GetComponent<PlayerMovement>().LightsaberFinalColor;
+                RedArrow.GetComponent<Image>().color = Player.GetComponent<PlayerMovement>().LightsaberFinalColor;
             }
             if(gameState == 7 || gameState == 1)
             {
@@ -186,9 +186,9 @@ public class Manager : MonoBehaviour
             for (int i = gameState-1; i > -1; i--)
             {
                 
-                sevenSquares[i].GetComponent<Image>().color = Color.blue;
+                sevenSquares[i].GetComponent<Image>().color = Player.GetComponent<PlayerMovement>().LightsaberFinalColor;
+                BlueArrow.GetComponent<Image>().color = Player.GetComponent<PlayerMovement>().LightsaberFinalColor;
 
-                
             }
             
             if (gameState == 7 || gameState == 1)

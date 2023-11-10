@@ -19,6 +19,7 @@ public class Sword : MonoBehaviour
     [SerializeField] float knockBackForce;
 
     [SerializeField] AudioSource LightsaberHitSound;
+    public GameObject LightsaberEnd;
     private void Start()
     {
         manager = FindObjectOfType<Manager>();
@@ -69,7 +70,11 @@ public class Sword : MonoBehaviour
         {
             if (isInHands && collision.gameObject.GetComponent<Sword>().isInHands)
             {
-                SwordHolder.GetComponent<PlayerMovement>().swordGoingBack = true;
+                if (SwordHolder.GetComponent<PlayerMovement>().isSwinging)
+                {
+                    SwordHolder.GetComponent<PlayerMovement>().swordGoingBack = true;
+                }
+                
 
                 SwordHolder.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 SwordHolder.GetComponent<Rigidbody2D>().AddForce(transform.right * 265);

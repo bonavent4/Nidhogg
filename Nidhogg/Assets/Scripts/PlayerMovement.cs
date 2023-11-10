@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     int swordPlace = 1;
     [SerializeField] GameObject swordPlacement;
     [SerializeField] Transform swordOverHeadPlace;
-    [SerializeField] GameObject sword;
+    public GameObject sword;
     bool hasSword;
 
     [SerializeField] float throwForce;
@@ -44,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool isPlayer1;
 
-    [SerializeField]bool isSwinging;
+    public bool isSwinging;
     public bool swordGoingBack;
     Vector3 previousPosition;
     Vector3 goToPosition;
@@ -85,6 +86,20 @@ public class PlayerMovement : MonoBehaviour
     float UnSlideTimer;
     [SerializeField] float TimeBeforUnSlide;
     bool CanStandFromSlide = true;
+
+    [SerializeField] AudioSource DieSound;
+
+    public bool HaveStarted;
+
+    [SerializeField] Color[] colors;
+    [SerializeField] GameObject MenuSword;
+    [SerializeField] int ColorNumber;
+    [SerializeField] KeyCode[] rightAndLeftInput;
+    public bool hasChosenColor;
+    public TextMeshProUGUI ChooseText;
+
+    public Color LightsaberFinalColor;
+    
     private void Start()
     {
         speed = Walkspeed;
@@ -95,11 +110,83 @@ public class PlayerMovement : MonoBehaviour
         sword = Instantiate(SwordVarients[Random.Range(0, SwordVarients.Length)], gameObject.transform.position, gameObject.transform.rotation); ;
         //sword.transform.parent = null;
         PickupSword();
+        if (isPlayer1)
+        {
+            MenuSword.GetComponent<Image>().color = colors[0];
+        }
+        else
+        {
+            MenuSword.GetComponent<Image>().color = colors[1];
+            ColorNumber += 1;
+        }
+        ChooseText.text = "Choosing Color";
+        ChooseText.color = Color.red;
     }
 
 
     private void Update()
     {
+        if (!HaveStarted)
+        {
+            if(Input.GetKeyDown(rightAndLeftInput[1]) && !hasChosenColor)
+            {
+                ColorNumber++;
+                if (ColorNumber == OtherPlayer.GetComponent<PlayerMovement>().ColorNumber)
+                {
+                    ColorNumber++;
+                }
+                if (ColorNumber == colors.Length)
+                {
+                    ColorNumber = 0;
+                }
+                if (ColorNumber == OtherPlayer.GetComponent<PlayerMovement>().ColorNumber)
+                {
+                    ColorNumber++;
+                }
+                LightsaberSound.Play();
+                MenuSword.GetComponent<Animator>().SetTrigger("Light");
+                MenuSword.GetComponent<Image>().color = colors[ColorNumber];
+                
+            }
+            if(Input.GetKeyDown(rightAndLeftInput[0]) && !hasChosenColor)
+            {
+                ColorNumber--;
+                if (ColorNumber == OtherPlayer.GetComponent<PlayerMovement>().ColorNumber)
+                {
+                    ColorNumber--;
+                }
+                if (ColorNumber == -1)
+                {
+                    ColorNumber = colors.Length - 1;
+                }
+                if (ColorNumber == OtherPlayer.GetComponent<PlayerMovement>().ColorNumber)
+                {
+                    ColorNumber--;
+                }
+                LightsaberSound.Play();
+                MenuSword.GetComponent<Animator>().SetTrigger("Light");
+                MenuSword.GetComponent<Image>().color = colors[ColorNumber];
+
+            }
+            if (Input.GetKeyDown(inputs[2]))
+            {
+                if (!hasChosenColor)
+                {
+                    hasChosenColor = true;
+                    ChooseText.text = "Locked";
+                    ChooseText.color = Color.green;
+                    LightsaberFinalColor = colors[ColorNumber];
+                }
+                else
+                {
+                    hasChosenColor = false;
+                    ChooseText.text = "Choosing Color";
+                    ChooseText.color = Color.red;
+                }
+                
+            }
+            
+        }
         if (isGettingKnockedBack)
         {
             if(knockBackTimer < TimeBeforeConcience)
@@ -159,7 +246,7 @@ public class PlayerMovement : MonoBehaviour
         }
         
 
-        if (!anim.GetBool("IsDead") && !isGettingKnockedBack)
+        if (!anim.GetBool("IsDead") && !isGettingKnockedBack && HaveStarted)
         {
             JumpAndDuck();
             if (!isSwinging)
@@ -174,7 +261,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (!anim.GetBool("IsDead") && !isGettingKnockedBack && CanStandFromSlide)
+        if (!anim.GetBool("IsDead") && !isGettingKnockedBack && CanStandFromSlide && HaveStarted)
         {
             Movement();
         }
@@ -389,8 +476,10 @@ public class PlayerMovement : MonoBehaviour
     void PickupSword()
     {
         sword.transform.parent = swordPlacement.transform;
-        sword.transform.position = swordPlacement.transform.position;
-        sword.transform.rotation = swordPlacement.transform.rotation;
+        sword.transform.position = CrouchSwordPosition.transform.position;
+        sword.transform.rotation = CrouchSwordPosition.transform.rotation;
+
+        sword.GetComponent<Animator>().SetTrigger("Light");
 
         sword.GetComponent<Sword>().isInHands = true;
 
@@ -399,7 +488,7 @@ public class PlayerMovement : MonoBehaviour
 
         hasSword = true;
 
-        swordPlace = 1;
+        swordPlace = 0;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -442,7 +531,9 @@ public class PlayerMovement : MonoBehaviour
                 sword.GetComponent<Rigidbody2D>().isKinematic = false;
                 sword.GetComponent<Sword>().isInHands = false;
             }
-            
+
+            DieSound.Play();
+
             hasSword = false;
             
             sword = null;
@@ -474,7 +565,8 @@ public class PlayerMovement : MonoBehaviour
                 Destroy(sword);
             }
 
-            sword = Instantiate(SwordVarients[Random.Range(0, SwordVarients.Length)], gameObject.transform.position, gameObject.transform.rotation); ;
+            sword = Instantiate(SwordVarients[Random.Range(0, SwordVarients.Length)], gameObject.transform.position, gameObject.transform.rotation);
+            sword.GetComponent<Sword>().LightsaberEnd.GetComponent<SpriteRenderer>().color = LightsaberFinalColor;
             //sword.transform.parent = null;
             PickupSword();
         }
